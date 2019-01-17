@@ -4,7 +4,8 @@ MAINTAINER d2cio <reg@d2c.io>
 
 # Set ENVIROINMENTS
 ENV MAGENTO_VERSION 2.3.0
-ENV INSTALL_DIR /var/www/magento_2
+ENV INSTALL_DIR /var/www/html/magento2-$MAGENTO_VERSION
+ENV COMPOSER_HOME /root/.composer
 
 # Install extensions
 RUN apt-get update && \
@@ -25,13 +26,9 @@ RUN apt-get update && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     rm -rf /tmp/* ~/.pearrc /var/lib/apt/lists/* && \
 # Get magento
-    mkdir $INSTALL_DIR && \
     curl https://codeload.github.com/magento/magento2/tar.gz/$MAGENTO_VERSION -o $MAGENTO_VERSION.tar.gz && \
     tar xf $MAGENTO_VERSION.tar.gz && \
-    mv magento2-$MAGENTO_VERSION/* $INSTALL_DIR && \
-# Set www-data permissions
-    chown -R www-data:www-data /var/www && \
-    su -l www-data -s /bin/bash -c "cd $INSTALL_DIR && composer install" && \
+# Run Composer
     cd $INSTALL_DIR && \
     composer install && \
     find $INSTALL_DIR -type f -exec chmod 644 {} \; && \
@@ -41,6 +38,8 @@ RUN apt-get update && \
     find $INSTALL_DIR/pub/static -type d -exec chmod 777 {} \; && \
     chmod 777 $INSTALL_DIR/app/etc && \
     chmod 644 $INSTALL_DIR/app/etc/*.xml && \
+    chmod +x $INSTALL_DIR/bin/magento && \
+    tar -cJf /var/www/magento_2.tar * && \
     rm -rf /var/www/html
 
 WORKDIR /var/www
