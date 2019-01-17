@@ -43,4 +43,4 @@ RUN apt-get update && \
     chmod 644 $INSTALL_DIR/app/etc/*.xml && \
     rm -rf /var/www/html
 
-WORKDIR $INSTALL_DIR
+WORKDIR /var/www
