@@ -31,6 +31,7 @@ RUN apt-get update && \
 # Run Composer
     cd $INSTALL_DIR && \
     composer install && \
+    chown -R www-data:www-data /var/www && \
     find $INSTALL_DIR -type f -exec chmod 644 {} \; && \
     find $INSTALL_DIR -type d -exec chmod 755 {} \; && \
     find $INSTALL_DIR/var -type d -exec chmod 777 {} \; && \
