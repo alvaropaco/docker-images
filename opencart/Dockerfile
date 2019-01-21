@@ -4,7 +4,6 @@ MAINTAINER d2cio <reg@d2c.io>
 
 # Set ENVIROINMENTS
 ENV OPENCART_VERSION 3.0.3.1
-ENV INSTALL_DIR /var/www/html/opencart-$OPENCART_VERSION
 
 # Install extensions
 RUN apt-get update && \
@@ -23,6 +22,5 @@ RUN apt-get update && \
     rm -rf /tmp/* ~/.pearrc /var/lib/apt/lists/* && \
 # Get opencart
     curl https://codeload.github.com/opencart/opencart/tar.gz/$OPENCART_VERSION -o /var/www/$OPENCART_VERSION.tar.gz && \
-    rm -rf /var/www/html
 
 WORKDIR /var/www
