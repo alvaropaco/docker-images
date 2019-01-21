@@ -28,9 +28,6 @@ RUN apt-get update && \
     cd $INSTALL_DIR && \
     rm -rf $INSTALL_DIR/upload/system/storage/vendor && \
     composer install && \
-    mkdir $INSTALL_DIR/storage && \
-    mv $INSTALL_DIR/upload/system/storage/* $INSTALL_DIR/storage/ && \
-    rm -rf $INSTALL_DIR/upload/system/storage && \
     tar -cJf /var/www/opencart_3.tar * && \
     rm -rf /var/www/html
 
