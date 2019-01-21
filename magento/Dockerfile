@@ -31,6 +31,9 @@ RUN apt-get update && \
 # Run Composer
     cd $INSTALL_DIR && \
     composer install && \
+    mkdir $INSTALL_DIR/var/page_cache && \
+    mkdir -p $INSTALL_DIR/pub/media/catalog/product/i && \
+    mkdir $INSTALL_DIR/pub/media/catalog/product/cache && \
     chown -R www-data:www-data /var/www && \
     find $INSTALL_DIR -type f -exec chmod 644 {} \; && \
     find $INSTALL_DIR -type d -exec chmod 755 {} \; && \
