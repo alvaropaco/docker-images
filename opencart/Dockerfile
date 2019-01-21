@@ -21,6 +21,6 @@ RUN apt-get update && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     rm -rf /tmp/* ~/.pearrc /var/lib/apt/lists/* && \
 # Get opencart
-    curl https://codeload.github.com/opencart/opencart/tar.gz/$OPENCART_VERSION -o /var/www/$OPENCART_VERSION.tar.gz && \
+    curl https://codeload.github.com/opencart/opencart/tar.gz/$OPENCART_VERSION -o /var/www/$OPENCART_VERSION.tar.gz
 
 WORKDIR /var/www
