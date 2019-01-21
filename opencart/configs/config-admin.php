@@ -1,11 +1,11 @@
 <?php
 
 // HTTP
-define('HTTP_SERVER', getenv('ADMIN_URL'));
-define('HTTP_CATALOG', getenv('SITE_URL'));
+define('HTTP_SERVER', '/admin/');
+define('HTTP_CATALOG', '/');
 // HTTPS
-define('HTTPS_SERVER', getenv('ADMIN_URL'));
-define('HTTPS_CATALOG', getenv('SITE_URL'));
+define('HTTPS_SERVER', '/admin/');
+define('HTTPS_CATALOG', '/');
 // DIR
 define('DIR_ROOT', getenv('DIR_ROOT'));
 define('DIR_APPLICATION', DIR_ROOT . 'upload/admin/');

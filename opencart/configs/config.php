@@ -1,9 +1,9 @@
 <?php
 
 // HTTP
-define('HTTP_SERVER', getenv('SITE_URL'));
+define('HTTP_SERVER', '/');
 // HTTPS
-define('HTTPS_SERVER', getenv('SITE_URL'));
+define('HTTPS_SERVER', '/');
 // DIR
 define('DIR_ROOT', getenv('DIR_ROOT'));
 define('DIR_APPLICATION', DIR_ROOT . 'upload/catalog/');
