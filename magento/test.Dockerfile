@@ -4,7 +4,6 @@ MAINTAINER d2cio <reg@d2c.io>
 
 # Set ENVIROINMENTS
 ENV MAGENTO_VERSION 2.3.0
-ENV INSTALL_DIR /var/www/html/magento2-$MAGENTO_VERSION
 
 # Install extensions
 RUN apt-get update && \
@@ -23,12 +22,14 @@ RUN apt-get update && \
     find /usr/local -type f -name '*.so*' -exec ldd '{}' ';' | awk '/=>/ { print $(NF-1) }' | sort -u | \
     xargs -r dpkg-query --search | cut -d: -f1 | sort -u | xargs -r apt-mark manual && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
-    rm -rf /tmp/* ~/.pearrc /var/lib/apt/lists/* && \
+    rm -rf /tmp/* ~/.pearrc /var/lib/apt/lists/*
 # Get magento
+RUN mkdir /var/www/magento2 && \
     curl https://codeload.github.com/magento/magento2/tar.gz/$MAGENTO_VERSION -o $MAGENTO_VERSION.tar.gz && \
-    tar xf $MAGENTO_VERSION.tar.gz && \
+    tar xf $MAGENTO_VERSION.tar.gz -C /var/www/magento2 --strip-components=1 && \
+    chown -R www-data:www-data /var/www/magento2
 # Run Composer
-    su -l www-data -s "cd $INSTALL_DIR && composer install" && \
+RUN su -l www-data -s /bin/bash -c "cd /var/www/magento2 && composer install" && \
     tar -cJf /var/www/magento_2.tar * && \
     rm -rf /var/www/html
 
