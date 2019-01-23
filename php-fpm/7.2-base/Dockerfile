@@ -25,4 +25,9 @@ RUN set -x && \
 		echo; \
 	} | tee /usr/local/etc/php-fpm.d/www.conf && \
 #
+	rm -rf /var/www/html && \
+	chown -R www-data:www-data /var/www && \
+#
 	curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+WORKDIR /var/www
