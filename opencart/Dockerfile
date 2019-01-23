@@ -4,7 +4,7 @@ MAINTAINER d2cio <reg@d2c.io>
 
 # Set ENVIROINMENTS
 ENV OPENCART_VERSION 3.0.3.1
-ENV INSTALL_DIR /var/www/html/opencart-$OPENCART_VERSION
+ENV INSTALL_DIR /var/www/opencart-$OPENCART_VERSION
 
 # Install extensions
 RUN apt-get update && \
@@ -29,8 +29,6 @@ RUN apt-get update && \
     rm -rf $INSTALL_DIR/upload/system/storage/vendor && \
     composer install && \
     tar -cJf /var/www/opencart_3.tar * && \
-    rm -rf /var/www/html
+    rm -rf $INSTALL_DIR
 
 COPY ./configs /var/www/configs
-
-WORKDIR /var/www
