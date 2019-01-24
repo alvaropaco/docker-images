@@ -4,7 +4,6 @@ MAINTAINER d2cio <reg@d2c.io>
 
 # Set ENVIROINMENTS
 ENV OPENCART_VERSION 3.0.3.1
-ENV INSTALL_DIR /var/www/opencart-$OPENCART_VERSION
 
 # Install extensions
 RUN apt-get update && \
@@ -22,13 +21,13 @@ RUN apt-get update && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     rm -rf /tmp/* ~/.pearrc /var/lib/apt/lists/* && \
 # Get opencart
-    curl https://codeload.github.com/opencart/opencart/tar.gz/$OPENCART_VERSION -o $OPENCART_VERSION.tar.gz && \
-    tar xf $OPENCART_VERSION.tar.gz && \
+    mkdir /var/www/opencart && \
+    curl https://codeload.github.com/opencart/opencart/tar.gz/$OPENCART_VERSION | tar xz -C /var/www/opencart --strip-components=1 && \
+    chown -R www-data:www-data /var/www/opencart && \
 # Run Composer
-    cd $INSTALL_DIR && \
-    rm -rf $INSTALL_DIR/upload/system/storage/vendor && \
-    su -l www-data -s /bin/bash -c "composer install" && \
+    rm -rf /var/www/opencart/upload/system/storage/vendor && \
+    su -l www-data -s /bin/bash -c "cd /var/www/opencart && composer install" && \
     tar -cJf /var/www/opencart_3.tar * && \
-    rm -rf $INSTALL_DIR
+    rm -rf /var/www/opencart
 
 COPY ./configs /var/www/configs
