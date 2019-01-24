@@ -27,7 +27,7 @@ RUN apt-get update && \
 # Run Composer
     cd $INSTALL_DIR && \
     rm -rf $INSTALL_DIR/upload/system/storage/vendor && \
-    composer install && \
+    su -l www-data -s /bin/bash -c "composer install" && \
     tar -cJf /var/www/opencart_3.tar * && \
     rm -rf $INSTALL_DIR
 
