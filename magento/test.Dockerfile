@@ -3,6 +3,8 @@ FROM mastappl/php-fpm:7.2-base
 ARG MAGENTO_VERSION=2.3.0
 
 ENV SERVICE=magento2 \
+	SERVICE_VERSION=$MAGENTO_VERSION \
+	\
 	MAGENTO_VERSION=$MAGENTO_VERSION
 
 RUN set -x && \
@@ -49,14 +51,14 @@ RUN set -x && \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
 	rm -rf /tmp/* ~/.pearrc /var/lib/apt/lists/* && \
 #
-	mkdir -p /var/www/magento2 && \
-	curl -sL https://codeload.github.com/magento/magento2/tar.gz/$MAGENTO_VERSION | tar xz -C /var/www/magento2 --strip-components=1 && \
-	chown -R www-data:www-data /var/www/magento2 && \
+	mkdir -p /var/www/$SERVICE && \
+	curl -sL https://codeload.github.com/magento/$SERVICE/tar.gz/$MAGENTO_VERSION | tar xz -C /var/www/$SERVICE --strip-components=1 && \
+	chown -R www-data:www-data /var/www/$SERVICE && \
 #
-	su -l www-data -s /bin/bash -c "cd /var/www/magento2 && composer install" && \
+	su -l www-data -s /bin/bash -c "cd /var/www/$SERVICE && composer install" && \
 #
-	tar cJf /usr/src/magento2-$MAGENTO_VERSION.tar.xz -C /var/www magento2 && \
-	rm -rf /var/www/magento2
+	tar cJf /usr/src/$SERVICE-$SERVICE_VERSION.tar.xz -C /var/www $SERVICE && \
+	rm -rf /var/www/$SERVICE
 
 ADD *.sh /
 RUN set -x && \

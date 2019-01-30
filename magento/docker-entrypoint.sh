@@ -2,24 +2,26 @@
 
 set -e
 
-version="${MAGENTO_VERSION}"
-
 log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') $@"
 }
 
+SERVICE_NAME="$([[ -n "${SERVICE_NAME}" ]] && echo "${SERVICE_NAME}" || echo "${SERVICE}")"
+
 if [[ "${1}" == "extract" ]]; then
 
-  file="/usr/src/${SERVICE}-${version}.tar.xz"
+  file="/usr/src/${SERVICE}-${SERVICE_VERSION}.tar.xz"
 
-  log "Extract archive ${file} to /var/www"
+  log "Extract archive ${file} to /var/www/${SERVICE_NAME}"
 
-  if [[ -f "$file" ]]; then
-    tar xJf "${file}" -C /var/www --keep-newer-files
-  else
+  if [[ ! -f "$file" ]]; then
     log "Archive ${file} not found" >&2
     exit 1
   fi
+
+  mkdir -p "/var/www/${SERVICE_NAME}"
+  chown www-data:www-data "/var/www/${SERVICE_NAME}"
+  tar xJf "${file}" -C "/var/www/${SERVICE_NAME}" --strip-components=1 --keep-newer-files
 
 elif [[ "${@:1:2}" == "backup file" ]]; then
 
@@ -28,14 +30,14 @@ elif [[ "${@:1:2}" == "backup file" ]]; then
   if [[ -n "${3}" && ! -f "/var/backups/${3}" ]]; then
     backup_file="/var/backups/${3}"
   else
-    backup_file="/var/backups/${SERVICE}-${version}-$(date '+%Y%m%d%H%M%S.%N')"
+    backup_file="/var/backups/${SERVICE}-${SERVICE_VERSION}-$(date '+%Y%m%d%H%M%S.%N')"
   fi
 
-  log "Backup /var/www/${SERVICE} to ${backup_file}"
+  log "Backup /var/www/${SERVICE_NAME} to ${backup_file}.tar"
 
   exclude_path=
   for p in $(echo "${EXCLUDE_PATH}" | tr ':' ' '); do
-    p="$(echo "${p}" | grep "^/var/www/${SERVICE}" | sed 's/^\/var\/www\///')"
+    p="$(echo "${p}" | grep "^/var/www/${SERVICE_NAME}" | sed 's/^\/var\/www\///')"
     if [[ -n "${p}" ]]; then
       exclude_path="${exclude_path} --exclude=\"${p}\""
     fi
@@ -45,13 +47,13 @@ elif [[ "${@:1:2}" == "backup file" ]]; then
   fi
 
   free_size="$(df -B1 --output=avail / | tail -n 1)"
-  backup_size="$(tar c ${exclude_path} -C /var/www "${SERVICE}" | wc -c)"
+  backup_size="$(tar c ${exclude_path} -C /var/www "${SERVICE_NAME}" | wc -c)"
   if [[ "${backup_size}" -gt "${free_size}" ]]; then
     log "Disk space is too low" >&2
     exit 1
   fi
 
-  tar cf "${backup_file}" ${exclude_path} -C /var/www "${SERVICE}"
+  tar cf "${backup_file}" ${exclude_path} -C /var/www "${SERVICE_NAME}"
   mv "${backup_file}" "${backup_file}.tar"
 
 elif [[ "${@:1:2}" == "restore file" ]]; then
@@ -64,23 +66,25 @@ elif [[ "${@:1:2}" == "restore file" ]]; then
   if [[ -n "${3}" && -f "/var/backups/${3}.tar" ]]; then
     backup_file="/var/backups/${3}.tar"
   else
-    backup_file=$(find /var/backups -maxdepth 1 -type f -name "${SERVICE}-${version}-*.tar" | sort | tail -n 1)
+    backup_file=$(find /var/backups -maxdepth 1 -type f -name "${SERVICE}-${SERVICE_VERSION}-*.tar" | sort | tail -n 1)
     if [[ ! -f "${backup_file}" ]]; then
       log "Backup not found" >&2
       exit 1
     fi
   fi
 
-  log "Restore ${backup_file} to /var/www/${SERVICE}"
+  log "Restore ${backup_file} to /var/www/${SERVICE_NAME}"
 
-  tar xf "${backup_file}" -C /var/www
+  mkdir -p "/var/www/${SERVICE_NAME}"
+  chown www-data:www-data "/var/www/${SERVICE_NAME}"
+  tar xf "${backup_file}" -C "/var/www/${SERVICE_NAME}" --strip-components=1
 
 elif [[ "${1}" == "remove" ]]; then
 
-  log "Remove all data in /var/www/${SERVICE}"
+  log "Remove all data in /var/www/${SERVICE_NAME}"
 
   set +e
-  rm -rf "/var/www/${SERVICE}" 2>/dev/null
+  rm -rf "/var/www/${SERVICE_NAME}" 2>/dev/null
   set -e
 
 elif [[ "${1#-}" != "$1" ]]; then
