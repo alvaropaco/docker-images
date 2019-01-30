@@ -1,5 +1,23 @@
 #!/bin/bash
 
+set -e
+
+log() {
+  echo "$(date +'%Y-%m-%d %H:%M:%S') $@"
+}
+
+if [[ ! -f /etc/letsencrypt/cli.ini ]]; then
+  {
+    echo '# quiet = true'
+    echo 'staging = true'
+    echo 'break-my-certs = true'
+    echo 'non-interactive = true'
+    echo 'agree-tos = true'
+    echo 'authenticator = webroot'
+    echo 'webroot-path = /var/www/letsencrypt'
+  } | tee /etc/letsencrypt/cli.ini
+fi
+
 if [[ -n "${LETSENCRYPT_NO_QUIET}" ]]; then
   sed -i "s/^.*quiet = true$/# quiet = true/" /etc/letsencrypt/cli.ini
 else
@@ -13,8 +31,6 @@ else
   sed -i "s/^.*staging = true$/# staging = true/" /etc/letsencrypt/cli.ini
   sed -i "s/^.*break-my-certs = true$/# break-my-certs = true/" /etc/letsencrypt/cli.ini
 fi
-
-set -e
 
 if [[ ! -f "/etc/nginx/certificates/dhparam.pem" ]]; then
   openssl dhparam -out /etc/nginx/certificates/dhparam.pem 2048
